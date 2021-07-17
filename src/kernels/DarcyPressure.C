@@ -21,7 +21,11 @@ DarcyPressure::DarcyPressure(const InputParameters & parameters):ADKernelGrad(pa
 //Set the coefficients for the pressure kernel
 _permeability(getParam<Real>("permeability")),
 _viscosity(getParam<Real>("viscosity"))
-{}
+{
+// check that viscosity value is not zero
+if(_viscosity == 0)
+	paramError("viscosity","The viscosity must be a non-zero real number.");
+}
 
 ADRealVectorValue
 DarcyPressure::precomputeQpResidual(){
