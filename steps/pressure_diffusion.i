@@ -23,9 +23,15 @@
 	[diffusion]
 	type = DarcyPressure # Zero gravity,divergence-free form of Darcy's Law
 	variable = pressure #operate on the "pressure" variable from above
-	permeability = 0.8451e-09 #(m^2) assumed permeability of the porous medium
 	[]
 []
+
+[Materials]
+	[filter]
+		type = PackedColumn #Provides permeability and viscosity of water through packed 1mm spheres
+	[]
+[]
+
 
 [BCs]
   [inlet]
@@ -49,10 +55,11 @@
  	
  	#Set PETSc parameters to optimize solver efficiency
  	petsc_options_iname = '-pc_type -pc_hypre_type' #PETSc option pairs with values below
- 	petsc_options_value = 'hypre	boomerang'
+ 	petsc_options_value = 'hypre	boomeramg'
  []
  
  [Outputs]
  	exodus = true #Output Exodus Format
+ 	perf_graph = true # prints a performance report to the terminal
  []
 	
