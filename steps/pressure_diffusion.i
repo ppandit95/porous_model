@@ -26,6 +26,22 @@
 	[]
 []
 
+[AuxVariables]
+  [velocity]
+    order = CONSTANT # Since "pressure" is approximated linearly, its gradient must be constant
+    family = MONOMIAL_VEC # A monomial interpolation means this is an elemental AuxVariable
+  []
+[]
+
+[AuxKernels]
+  [velocity]
+    type = DarcyVelocity
+    variable = velocity # Store volumetric flux vector in "velocity" variable from above
+    pressure = pressure # Couple to the "pressure" variable from above
+    execute_on = TIMESTEP_END # Perform calculation at the end of the solve step - after Kernels run
+  []
+[]
+
 [Materials]
 	[filter]
 		type = PackedColumn #Provides permeability and viscosity of water through packed 1mm spheres
@@ -58,8 +74,10 @@
  	petsc_options_value = 'hypre	boomeramg'
  []
  
+
  [Outputs]
  	exodus = true #Output Exodus Format
  	perf_graph = true # prints a performance report to the terminal
  []
 	
+
