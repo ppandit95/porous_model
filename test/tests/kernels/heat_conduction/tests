@@ -1,0 +1,7 @@
+[Tests]
+ [test]
+ 	type = Exodiff
+ 	input = heat_conduction_test.i
+ 	exodiff = heat_conduction_test_out.e
+ []
+[]

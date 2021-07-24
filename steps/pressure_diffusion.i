@@ -17,12 +17,18 @@
 	[pressure]
 	#Adds a Linear Lagrange variable by default
 	[]
+	[temperature]
+	[]
 []
 
 [Kernels]
 	[diffusion]
 	type = DarcyPressure # Zero gravity,divergence-free form of Darcy's Law
 	variable = pressure #operate on the "pressure" variable from above
+	[]
+	[heat_conduction]
+		type = ADHeatConduction
+		variable = temperature
 	[]
 []
 
@@ -48,6 +54,11 @@
 		diameter = '1+2/3.04*x'
 		outputs = exodus
 	[]
+	[steel]
+		type = ADGenericConstantMaterial
+		prop_names = thermal_conductivity
+		prop_values = 18 
+	[]
 []
 
 
@@ -58,12 +69,23 @@
 	boundary = left
 	value = 4000 # (Pa) Gives the correct pressure drop from figure 2 for 1 mm spheres
   []
-
+  [inlet_temperature]
+  	type = DirichletBC
+  	variable = temperature
+  	boundary = left
+  	value = 350
+  []
   [outlet]
   	type = ADDirichletBC
   	variable = pressure
   	boundary = right
   	value = 0 # (Pa) Gives the correct pressure drop 
+  []
+  [outlet_temp]
+  	type = DirichletBC
+  	variable = temperature
+  	boundary = right
+  	value = 300
   []
  []
  

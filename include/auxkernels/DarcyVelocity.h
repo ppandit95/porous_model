@@ -17,6 +17,7 @@ protected:
   /// AuxKernels MUST override computeValue(), which is called on every Gauss QP for elemental
   /// AuxVariables. For nodal AuxVariables, it is called on every node instead and the _qp index
   /// automatically refers to those nodes.
+  
   virtual RealVectorValue computeValue() override;
 
   /// The gradient of a coupled variable, i.e., pressure
