@@ -23,7 +23,7 @@ class PackedColumn : public ADMaterial
 	   virtual void computeQpProperties() override;
 	   
 	   //The inputs for the diameter of spheres in the column and the dynamic viscosity of the  
-	   const Real & _diameter;
+	   const Function & _diameter;
 	   const Real & _input_viscosity;
 	   
 	   //This object interpolates permeability (m^2) based on the diameter(mm)
