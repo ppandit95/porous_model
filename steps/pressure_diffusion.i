@@ -45,6 +45,8 @@
 [Materials]
 	[filter]
 		type = PackedColumn #Provides permeability and viscosity of water through packed 1mm spheres
+		diameter = '1+2/3.04*x'
+		outputs = exodus
 	[]
 []
 
