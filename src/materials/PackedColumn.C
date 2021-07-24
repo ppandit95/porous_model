@@ -1,4 +1,5 @@
 #include "PackedColumn.h"
+#include "Function.h"
 
 registerMooseObject("porous_modelApp",PackedColumn);
 
@@ -12,26 +13,18 @@ PackedColumn::validParams()
 				    "the fluid in the medium.");
 				    
 	//Optional params for ball diameter and viscosity - inputs must satisfy range checked conditions
-	params.addRangeCheckedParam<Real>(
-	"diameter",
-	1.0,
-	"(1<=diameter) & (diameter <= 3)",
-	"The diameter (mm) of the steel spheres packed within the column that is used to compute"
-	"its permeability.The input must be in the range [1,3].The default value is 1mm.");
+	params.addParam<FunctionName>("diameter","1.0","The diameter of the steel spheres"
+	 "														that are packed in the column for computing permeability.");
 	
-	params.addRangeCheckedParam<Real>(
-	"viscosity",
-	7.98e-04,
-	"viscosity != 0",
-	"The dynamic viscosity ($\\mu$) of the fluid,the default value is that of water at 30"
-	"degrees Celcius (7.98e-04 Pa-s).");
+	params.addParam<Real>("viscosity",7.98e-4,"The viscosity ($\\mu$) of the fluid"
+	 											"in Pa,the default value is for water at 30 degrees C.");
 	
 	return params;
 }
 
 PackedColumn::PackedColumn(const InputParameters & parameters)
 :Material(parameters),
-_diameter(getParam<Real>("diameter")),
+_diameter(getFunction("diameter")),
 _input_viscosity(getParam<Real>("viscosity")),
 
 //Declare two material properties by getting a reference from the MOOSE Material system
@@ -49,7 +42,9 @@ _viscosity(declareADProperty<Real>("viscosity"))
 void 
 PackedColumn::computeQpProperties()
 {
-	_permeability[_qp] = _permeability_interpolation.sample(_diameter);
+	Real value = _diameter.value(_t,_q_point[_qp]);
+	mooseAssert(value >= 1 && value <= 3,
+							"The diameter range must be in the range [1,3] but"<<value<<"provided.");
+	_permeability[_qp] = _permeability_interpolation.sample(value);
 	_viscosity[_qp] = _input_viscosity;
 }
-
