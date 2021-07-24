@@ -5,6 +5,7 @@
 	ny = 2
 	xmax = 1
 	ymax = 1
+	
 []
 
 [Problem]
@@ -19,9 +20,8 @@
 [Materials]
 	[filter]
 		type = PackedColumn
-		diameter = 2
+		diameter = 2*x+y
 		viscosity = 1e-03
-		output_parameters = 'permeability viscosity'
 		outputs = exodus
 	[]
 []
