@@ -87,10 +87,10 @@
   	value = 0 # (Pa) Gives the correct pressure drop 
   []
   [outlet_temp]
-  	type = DirichletBC
+  	type = HeatConductionOutflow
   	variable = temperature
   	boundary = right
-  	value = 300
+  	
   []
  []
  
