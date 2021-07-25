@@ -18,16 +18,21 @@
 	#Adds a Linear Lagrange variable by default
 	[]
 	[temperature]
+		initial_condition = 300
 	[]
 []
 
 [Kernels]
 	[diffusion]
-	type = DarcyPressure # Zero gravity,divergence-free form of Darcy's Law
-	variable = pressure #operate on the "pressure" variable from above
+		type = DarcyPressure # Zero gravity,divergence-free form of Darcy's Law
+		variable = pressure #operate on the "pressure" variable from above
 	[]
 	[heat_conduction]
 		type = ADHeatConduction
+		variable = temperature
+	[]
+	[heat_conduction_time_derivative]
+		type = ADHeatConductionTimeDerivative
 		variable = temperature
 	[]
 []
@@ -56,8 +61,8 @@
 	[]
 	[steel]
 		type = ADGenericConstantMaterial
-		prop_names = thermal_conductivity
-		prop_values = 18 
+		prop_names = 'thermal_conductivity specific_heat density'
+		prop_values = '18 0.466 8000' 
 	[]
 []
 
@@ -90,7 +95,8 @@
  []
  
  [Executioner]
- 	type = Steady #Steady state problem
+ 	type = Transient
+ 	num_steps = 10
  	solve_type = NEWTON #Perform a Newton Solver
  	
  	#Set PETSc parameters to optimize solver efficiency

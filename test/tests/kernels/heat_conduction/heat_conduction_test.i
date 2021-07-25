@@ -7,12 +7,17 @@
 
 [Variables]
 	[temperature]
+		initial_condition = 0
 	[]
 []
 
 [Kernels]
 	[heat_conduction]
 		type = ADHeatConduction
+		variable = temperature
+	[]
+	[heat_conduction_time_derivative]
+		type = ADHeatConductionTimeDerivative
 		variable = temperature
 	[]
 []
@@ -35,8 +40,8 @@
 [Materials]
 	[steel]
 		type = ADGenericConstantMaterial
-		prop_names = thermal_conductivity
-		prop_values = 18
+		prop_names = 'thermal_conductivity specific_heat density'
+		prop_values = '18 0.466 8000'
 	[]
 []
 	
@@ -47,7 +52,8 @@
 []
 
 [Executioner]
-	type = Steady
+	type = Transient
+	num_steps = 10
 	solve_type = NEWTON
 	petsc_options_iname = '-pc_type -pc_hypre_type'
 	petsc_options_value = 'hypre boomeramg'
