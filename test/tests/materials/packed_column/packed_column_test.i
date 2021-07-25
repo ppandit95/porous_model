@@ -21,7 +21,7 @@
 	[filter]
 		type = PackedColumn
 		diameter = 2*x+y
-		viscosity = 1e-03
+		temperature = temperature
 		outputs = exodus
 	[]
 []

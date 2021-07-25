@@ -35,6 +35,11 @@
 		type = ADHeatConductionTimeDerivative
 		variable = temperature
 	[]
+	[heat_convection]
+		type = DarcyAdvection
+		variable = temperature
+		pressure = pressure
+	[]
 []
 
 [AuxVariables]
@@ -58,12 +63,9 @@
 		type = PackedColumn #Provides permeability and viscosity of water through packed 1mm spheres
 		diameter = '1+2/3.04*x'
 		outputs = exodus
+		temperature = temperature
 	[]
-	[steel]
-		type = ADGenericConstantMaterial
-		prop_names = 'thermal_conductivity specific_heat density'
-		prop_values = '18 0.466 8000' 
-	[]
+	
 []
 
 
@@ -75,10 +77,10 @@
 	value = 4000 # (Pa) Gives the correct pressure drop from figure 2 for 1 mm spheres
   []
   [inlet_temperature]
-  	type = DirichletBC
+  	type = FunctionDirichletBC
   	variable = temperature
   	boundary = left
-  	value = 350
+  	function = 'if(t<0,350+50*t,350)'
   []
   [outlet]
   	type = ADDirichletBC
@@ -98,10 +100,23 @@
  	type = Transient
  	num_steps = 10
  	solve_type = NEWTON #Perform a Newton Solver
+ 	automatic_scaling = true
  	
  	#Set PETSc parameters to optimize solver efficiency
  	petsc_options_iname = '-pc_type -pc_hypre_type' #PETSc option pairs with values below
  	petsc_options_value = 'hypre	boomeramg'
+ 	
+ 	end_time = 100
+ 	dt = 0.25
+ 	start_time = -1
+ 	
+ 	steady_state_tolerance = 1e-5
+ 	steady_state_detection = true
+ 	
+ 	[TimeStepper]
+ 		type = FunctionDT
+ 		function = 'if(t<0,0.1,0.25)'
+ 	[]
  []
  
 
