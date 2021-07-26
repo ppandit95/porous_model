@@ -1,8 +1,8 @@
 [Mesh]
 	type = GeneratedMesh #Can generate simple lines,rectangles and rectangular prisms
 	dim  = 2 #Dimensions of the mesh
-	nx   = 1000 #Number of elements in the x direction
-	ny   = 10   #Number of elements in the y direction
+	nx   = 30 #Number of elements in the x direction
+	ny   = 3   #Number of elements in the y direction
 	xmax = 0.304 #Length of test chamber
 	ymax = 0.0257 #Test chamber radius
 []
@@ -139,5 +139,22 @@
  	exodus = true #Output Exodus Format
  	perf_graph = true # prints a performance report to the terminal
  []
-	
-
+ [Adaptivity]
+ 	marker = error_frac
+ 	max_h_level = 3
+ 	[Indicators]
+ 		[temperature_jump]
+ 			type = GradientJumpIndicator
+ 			variable = temperature
+ 			scale_by_flux_faces = true
+ 		[]
+ 	[]
+ 	[Markers]
+ 		[error_frac]
+ 			type = ErrorFractionMarker
+ 			coarsen = 0.15
+ 			indicator = temperature_jump
+ 			refine = 0.7
+ 		[]
+ 	[]
+ []
