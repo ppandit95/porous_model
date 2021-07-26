@@ -52,12 +52,23 @@
   []
 []
 
+[Functions]
+	[inlet_function]
+		type = ParsedFunction
+		value = 2000*sin(0.466*pi*t)
+	[]
+	[outlet_function]
+		type = ParsedFunction
+		value = 2000*cos(0.466*pi*t)
+	[]
+[]
+
 [BCs]
   [inlet]
-	type = ADDirichletBC
+	type = FunctionDirichletBC
 	variable = pressure
 	boundary = left
-	value = 4000 # (Pa) Gives the correct pressure drop from figure 2 for 1 mm spheres
+	function = inlet_function
   []
   [inlet_temperature]
   	type = FunctionDirichletBC
@@ -66,10 +77,10 @@
   	function = 'if(t<0,350+50*t,350)'
   []
   [outlet]
-  	type = ADDirichletBC
+  	type = FunctionDirichletBC
   	variable = pressure
   	boundary = right
-  	value = 0 # (Pa) Gives the correct pressure drop 
+  	function = outlet_function
   []
   [outlet_temp]
   	type = HeatConductionOutflow
@@ -85,6 +96,11 @@
 		type = PackedColumn #Provides permeability and viscosity of water through packed 1mm spheres
 		diameter = 1
 		temperature = temperature
+		fluid_viscosity_file = data/water_viscosity.csv
+		fluid_density_file = data/water_density.csv
+		fluid_thermal_conductivity_file = data/water_thermal_conductivity.csv
+		fluid_specific_heat_file = data/water_specific_heat.csv
+		outputs = exodus
 	[]
 	
 []
@@ -114,7 +130,7 @@
  	
  	[TimeStepper]
  		type = FunctionDT
- 		function = 'if(t<0,0.1,0.25)'
+ 		function = 'if(t<0,0.1,(2*pi/(0.466*pi))/16)'
  	[]
  []
  
