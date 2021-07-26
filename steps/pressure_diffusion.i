@@ -1,11 +1,23 @@
 [Mesh]
-	type = GeneratedMesh #Can generate simple lines,rectangles and rectangular prisms
-	dim  = 2 #Dimensions of the mesh
-	nx   = 30 #Number of elements in the x direction
-	ny   = 3   #Number of elements in the y direction
-	xmax = 0.304 #Length of test chamber
-	ymax = 0.0257 #Test chamber radius
+	[generate]
+		type = GeneratedMeshGenerator #Can generate simple lines,rectangles and rectangular prisms
+		dim  = 2 #Dimensions of the mesh
+		nx   = 30 #Number of elements in the x direction
+		ny   = 3   #Number of elements in the y direction
+		xmax = 0.304 #Length of test chamber
+		ymax = 0.0257 #Test chamber radius
+	[]
+	[bottom]
+		type = SubdomainBoundingBoxGenerator
+		input = generate
+		location = inside
+		bottom_left = '0 0 0'
+		top_right = '0.304 0.01285 0'
+		block_id = 1
+	[]
 []
+
+
 
 [Variables]
 	[pressure]
@@ -92,17 +104,31 @@
  
 
 [Materials]
-	[filter]
+	viscosity_file = data/water_viscosity.csv
+	density_file = data/water_density.csv
+	thermal_conductivity_file = data/water_thermal_conductivity.csv
+	specific_heat_file = data/water_specific_heat.csv
+	[colum_bottom]
 		type = PackedColumn #Provides permeability and viscosity of water through packed 1mm spheres
-		diameter = 1
+		block = 1
+		diameter = 1.15
 		temperature = temperature
-		fluid_viscosity_file = data/water_viscosity.csv
-		fluid_density_file = data/water_density.csv
-		fluid_thermal_conductivity_file = data/water_thermal_conductivity.csv
-		fluid_specific_heat_file = data/water_specific_heat.csv
-		outputs = exodus
+		fluid_viscosity_file = ${viscosity_file}
+		fluid_density_file = ${density_file}
+		fluid_thermal_conductivity_file = ${thermal_conductivity_file}
+		fluid_specific_heat_file = ${specific_heat_file}
 	[]
-	
+	[column_top]
+		type = PackedColumn
+		block = 0
+		diameter = 1.45
+		temperature = temperature
+		porosity = '0.25952 + 0.7*x/0.304'
+		fluid_viscosity_file = ${viscosity_file}
+		fluid_density_file = ${density_file}
+		fluid_thermal_conductivity_file = ${thermal_conductivity_file}
+		fluid_specific_heat_file = ${specific_heat_file}
+	[]	
 []
 
 
@@ -138,6 +164,7 @@
  [Outputs]
  	exodus = true #Output Exodus Format
  	perf_graph = true # prints a performance report to the terminal
+ 	output_material_properties = true
  []
  [Adaptivity]
  	marker = error_frac
