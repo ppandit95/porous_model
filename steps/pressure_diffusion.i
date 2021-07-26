@@ -7,12 +7,6 @@
 	ymax = 0.0257 #Test chamber radius
 []
 
-[Problem]
-	type = FEProblem #This is the "normal" type of Finite element Problem in MOOSE
-	coord_type = RZ #Axis symmetric RZ
-	rz_coord_axis = X #Which axis the symmetry is around
-[]
-
 [Variables]
 	[pressure]
 	#Adds a Linear Lagrange variable by default
@@ -20,6 +14,13 @@
 	[temperature]
 		initial_condition = 300
 	[]
+[]
+
+[AuxVariables]
+  [velocity]
+    order = CONSTANT # Since "pressure" is approximated linearly, its gradient must be constant
+    family = MONOMIAL_VEC # A monomial interpolation means this is an elemental AuxVariable
+  []
 []
 
 [Kernels]
@@ -42,13 +43,6 @@
 	[]
 []
 
-[AuxVariables]
-  [velocity]
-    order = CONSTANT # Since "pressure" is approximated linearly, its gradient must be constant
-    family = MONOMIAL_VEC # A monomial interpolation means this is an elemental AuxVariable
-  []
-[]
-
 [AuxKernels]
   [velocity]
     type = DarcyVelocity
@@ -57,17 +51,6 @@
     execute_on = TIMESTEP_END # Perform calculation at the end of the solve step - after Kernels run
   []
 []
-
-[Materials]
-	[filter]
-		type = PackedColumn #Provides permeability and viscosity of water through packed 1mm spheres
-		diameter = '1+2/3.04*x'
-		outputs = exodus
-		temperature = temperature
-	[]
-	
-[]
-
 
 [BCs]
   [inlet]
@@ -96,9 +79,25 @@
   []
  []
  
+
+[Materials]
+	[filter]
+		type = PackedColumn #Provides permeability and viscosity of water through packed 1mm spheres
+		diameter = 1
+		temperature = temperature
+	[]
+	
+[]
+
+
+[Problem]
+	type = FEProblem #This is the "normal" type of Finite element Problem in MOOSE
+	coord_type = RZ #Axis symmetric RZ
+	rz_coord_axis = X #Which axis the symmetry is around
+[]
+
  [Executioner]
  	type = Transient
- 	num_steps = 10
  	solve_type = NEWTON #Perform a Newton Solver
  	automatic_scaling = true
  	
