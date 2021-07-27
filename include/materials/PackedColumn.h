@@ -60,6 +60,11 @@ class PackedColumn : public ADMaterial
 	   const Real & _fluid_cp;
 	   ADLinearInterpolation _fluid_cp_interpolation;
 	   
+	   /// Fluid thermal expansion coefficient
+ 	   bool _use_fluid_cte_interp;
+  	   const Real & _fluid_cte;
+  	   ADLinearInterpolation _fluid_cte_interpolation;
+	   
 	   //Solid thermal conductivity
 	   bool _use_solid_k_interp = false;
 	   const Real & _solid_k;
@@ -75,7 +80,10 @@ class PackedColumn : public ADMaterial
 	   const Real & _solid_cp;
 	   ADLinearInterpolation _solid_cp_interpolation;
 	   
-	   
+	   //Solid Thermal Expansion Coefficient
+	   bool _use_solid_cte_interp;
+	   const Real & _solid_cte;
+	   ADLinearInterpolation _solid_cte_interpolation;
 	   
 	   
 	   //The material property objects that hold values for permeability (K) and dynamic viscosity (mu)
@@ -85,5 +93,6 @@ class PackedColumn : public ADMaterial
 	   ADMaterialProperty<Real> & _thermal_conductivity;
 	   ADMaterialProperty<Real> & _density;
 	   ADMaterialProperty<Real> & _specific_heat;
+	   ADMaterialProperty<Real> & _thermal_expansion;
 };
 	   

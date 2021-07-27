@@ -1,3 +1,6 @@
+[GlobalParams]
+	displacements = 'disp_r disp_z'
+[]
 [Mesh]
 	[generate]
 		type = GeneratedMeshGenerator #Can generate simple lines,rectangles and rectangular prisms
@@ -18,7 +21,6 @@
 []
 
 
-
 [Variables]
 	[pressure]
 	#Adds a Linear Lagrange variable by default
@@ -28,12 +30,24 @@
 	[]
 []
 
+
 [AuxVariables]
   [velocity]
     order = CONSTANT # Since "pressure" is approximated linearly, its gradient must be constant
     family = MONOMIAL_VEC # A monomial interpolation means this is an elemental AuxVariable
   []
 []
+
+[Modules/TensorMechanics/Master]
+	[all]
+		add_variables = true
+		strain = FINITE
+		eigenstrain_names = eigenstrain
+		use_automatic_differentiation = true
+		generate_output = 'vonmises_stress elastic_strain_xx elastic_strain_yy strain_xx strain_yy'
+	[]
+[]
+			
 
 [Kernels]
 	[diffusion]
@@ -100,6 +114,24 @@
   	boundary = right
   	
   []
+  [hold_inlet]
+  	type = DirichletBC
+  	variable = disp_z
+  	boundary = bottom
+  	value = 0
+  []
+  [hold_center]
+  	type = DirichletBC
+  	variable = disp_r
+  	boundary = left
+  	value = 0
+  []
+  [hold_outside]
+  	type = DirichletBC
+  	variable = disp_r
+  	boundary = right
+  	value = 0
+  []
  []
  
 
@@ -108,6 +140,7 @@
 	density_file = data/water_density.csv
 	thermal_conductivity_file = data/water_thermal_conductivity.csv
 	specific_heat_file = data/water_specific_heat.csv
+	thermal_expansion_file = data/water_thermal_expansion.csv
 	[colum_bottom]
 		type = PackedColumn #Provides permeability and viscosity of water through packed 1mm spheres
 		block = 1
@@ -117,6 +150,7 @@
 		fluid_density_file = ${density_file}
 		fluid_thermal_conductivity_file = ${thermal_conductivity_file}
 		fluid_specific_heat_file = ${specific_heat_file}
+		fluid_thermal_expansion_file = ${thermal_expansion_file}
 	[]
 	[column_top]
 		type = PackedColumn
@@ -128,7 +162,23 @@
 		fluid_density_file = ${density_file}
 		fluid_thermal_conductivity_file = ${thermal_conductivity_file}
 		fluid_specific_heat_file = ${specific_heat_file}
+		fluid_thermal_expansion_file = ${thermal_expansion_file}
 	[]	
+	[elasticity_tensor]
+		type = ADComputeIsotropicElasticityTensor
+		youngs_modulus = 200e9
+		poissons_ratio = 0.3
+	[]
+	[elastic_stress]
+		type = ADComputeFiniteStrainElasticStress
+	[]
+	[thermal_strain]
+		type = ADComputeThermalExpansionEigenstrain
+		stress_free_temperature = 300
+		temperature = temperature
+		eigenstrain_name = eigenstrain
+		thermal_expansion_coeff = 1e-5
+	[]
 []
 
 
@@ -142,10 +192,12 @@
  	type = Transient
  	solve_type = NEWTON #Perform a Newton Solver
  	automatic_scaling = true
+ 	compute_scaling_once = false
  	
  	#Set PETSc parameters to optimize solver efficiency
- 	petsc_options_iname = '-pc_type -pc_hypre_type' #PETSc option pairs with values below
- 	petsc_options_value = 'hypre	boomeramg'
+ 	petsc_options_iname = '-pc_type ' #PETSc option pairs with values below
+ 	petsc_options_value = 'lu'
+ 	line_search = none
  	
  	end_time = 10
  	dt = 0.25
@@ -187,7 +239,6 @@
  [Outputs]
  	exodus = true #Output Exodus Format
  	perf_graph = true # prints a performance report to the terminal
- 	output_material_properties = true
  []
  [Adaptivity]
  	marker = error_frac
