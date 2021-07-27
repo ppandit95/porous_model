@@ -147,7 +147,7 @@
  	petsc_options_iname = '-pc_type -pc_hypre_type' #PETSc option pairs with values below
  	petsc_options_value = 'hypre	boomeramg'
  	
- 	end_time = 100
+ 	end_time = 10
  	dt = 0.25
  	start_time = -1
  	
@@ -160,6 +160,29 @@
  	[]
  []
  
+ [Postprocessors]
+ 	[average_temperature]
+ 		type = ElementAverageValue
+ 		variable = temperature
+ 	[]
+ 	[outlet_heat_flux]
+ 		type = ADSideDiffusiveFluxIntegral
+ 		variable = temperature
+ 		boundary = right
+ 		diffusivity = thermal_conductivity
+ 	[]
+ []
+ 
+ [VectorPostprocessors]
+ 	[temperature_sample]
+ 		type = LineValueSampler
+ 		num_points = 500
+ 		start_point = '0.1 0 0'
+ 		end_point = '0.1 0.0257 0'
+ 		variable = temperature
+ 		sort_by = y
+ 	[]
+ []
 
  [Outputs]
  	exodus = true #Output Exodus Format
